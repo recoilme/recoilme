@@ -1,1 +1,64 @@
-This file was created by IntelliJ IDEA 11.1.3 for binding GitHub repository
+My library project for android
+Contains
+- AsyncImageLoader
+- Rest Api for works with http
+Example:
+
+public class ImhonetActivity extends RestActivity
+{
+	private final int SPLASH_DISPLAY_LENGHT = 1000;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		BugSenseHandler.setup(this, getString(R.string.bugsense));
+        restGetRequest(RestService.HOST+"signin?key="+AndroidApplication.KEY,"token");
+	}
+
+    private void start() {
+        ImhonetActivity.this.startActivity(new Intent(ImhonetActivity.this,FilmsActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onRESTResult(int code, String result, String mode) {
+        if (mode.equals("token")) {
+            String token = "";
+            JSONObject obj = null;
+            try {
+                obj = new JSONObject(result);
+                obj = obj.optJSONObject("response");
+                token = obj.optString("token");
+            } catch (JSONException e) {
+                AndroidApplication.log(e);
+            }
+            finally {
+                obj = null;
+            }
+            if (!token.equals("") ) {
+                AndroidApplication.setToken(token);
+                if (AndroidApplication.getPrefsBoolean("logged")) {
+                    Bundle params = new Bundle();
+                    params.putString("login", AndroidApplication.getPrefsString("login"));
+                    params.putString("password", AndroidApplication.getPrefsString("pass"));
+                    String url = RestService.ApiToUri("user/auth", null);
+                    restPostRequest(url,"user/auth",params);
+                }
+                else {
+                    start();
+                }
+            }
+            else {
+                Toast.makeText(this,R.string.error_noconnection,Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (mode.equals("user/auth")){
+            start();
+        }
+        else {
+            Toast.makeText(this,R.string.error_noconnection,Toast.LENGTH_SHORT).show();
+        }
+    }
+}
