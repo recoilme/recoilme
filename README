@@ -3,6 +3,14 @@ Contains
 - AsyncImageLoader
 - Rest Api for works with http
 
+Usage:
+- include in main project like a library project
+- define app in manifest
+<application
+        android:name="App" />
+- Extend App from ru.recoilme.AndroidApplication
+Whats all
+
 Example:
 
 public class ImhonetActivity extends RestActivity
